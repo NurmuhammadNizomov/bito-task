@@ -1,0 +1,63 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: bito-mongodb
+    # Single-node replica set — required for multi-document transactions.
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      # Initiate the replica set once, then report healthy only after a PRIMARY exists.
+      test: >
+        mongosh --quiet --eval "
+          try { rs.status().ok }
+          catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb:27017'}]}).ok }
+        "
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: bito-server
+    ports:
+      - "${SERVER_PORT:-5000}:${SERVER_PORT:-5000}"
+    env_file:
+      - ./server/.env
+    environment:
+      # Override Mongo host for the docker network (compose service name).
+      MONGODB_URI: mongodb://mongodb:27017/bito_db?replicaSet=rs0
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    # Bind-mount source for hot reload; keep container's node_modules.
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: bito-client
+    ports:
+      - "${CLIENT_PORT:-5173}:${CLIENT_PORT:-5173}"
+    env_file:
+      - ./client/.env
+    depends_on:
+      - server
+    # Bind-mount source for Vite HMR; keep container's node_modules.
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
