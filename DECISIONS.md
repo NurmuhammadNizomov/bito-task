@@ -78,3 +78,11 @@ No/empty `tenantId` → **403**, not processed. A missing claim means no valid c
 **Cut**: product CRUD (catalog is seeded, task needs only search); register endpoint (users seeded); multi-tenant seed (one demo tenant); i18n (English only); in-process TTL cache instead of Redis (correct on the single `docker compose` container; async signatures kept for a one-file Redis swap).
 
 **Push-back**: the spec frames margin as one privileged number, but the boundary must hold on *every* cashier-reachable endpoint, not just the report — I'd want that stated up front, since it drives the data-layer design.
+
+## 10. Monorepo Architecture & Serverless Deployment
+
+- **Turborepo Monorepo**: Restructured from split directories into a clean Turborepo monorepo with `apps/web` (React 19 + Vite) and `apps/server` (Express API) managed by npm workspaces. Single-command build (`turbo run build`) and development (`turbo run dev`) with remote-caching compatibility.
+- **Unified Vercel Serverless Hosting**:
+  - The API is exposed via a lightweight serverless handler (`api/index.ts`) that guarantees database connection readiness (`await connectDB()`) on cold starts before delegating requests to the Express application.
+  - `vercel.json` provides edge rewrites: `/api/(.*)` directs to the Serverless handler while `/(.*)` rewrites to `/index.html` for client-side React Router navigation.
+  - Zero hardcoding: Clean `/api/v1` base route namespace shared across standalone Docker/Node.js deployments and Vercel serverless execution.
