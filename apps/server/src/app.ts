@@ -72,6 +72,7 @@ app.get('/v1/health', (_req: Request, res: Response) => {
 
 app.use('/api/v1', routes);
 app.use('/v1', routes);
+app.use('/api/v1/api/v1', routes);
 
 // Static file serving for React build (Single deployment for Vercel / Node)
 const candidateDistPaths = [

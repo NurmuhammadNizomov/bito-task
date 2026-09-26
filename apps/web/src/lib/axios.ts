@@ -20,12 +20,17 @@ export function getAccessToken() {
   return accessToken;
 }
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
-const baseURL = rawApiUrl.endsWith('/api/v1')
-  ? rawApiUrl
-  : rawApiUrl
-    ? `${rawApiUrl}/api/v1`
-    : '/api/v1';
+const raw = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+let baseURL = '/api/v1';
+if (raw) {
+  if (raw.endsWith('/api/v1')) {
+    baseURL = raw;
+  } else if (raw.endsWith('/api')) {
+    baseURL = `${raw}/v1`;
+  } else {
+    baseURL = `${raw}/api/v1`;
+  }
+}
 
 const api = axios.create({
   baseURL,
