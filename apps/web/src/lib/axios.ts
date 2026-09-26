@@ -20,17 +20,8 @@ export function getAccessToken() {
   return accessToken;
 }
 
-const raw = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
-let baseURL = '/api/v1';
-if (raw) {
-  if (raw.endsWith('/api/v1')) {
-    baseURL = raw;
-  } else if (raw.endsWith('/api')) {
-    baseURL = `${raw}/v1`;
-  } else {
-    baseURL = `${raw}/api/v1`;
-  }
-}
+const apiOrigin = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+const baseURL = apiOrigin.endsWith('/api/v1') ? apiOrigin : `${apiOrigin}/api/v1`;
 
 const api = axios.create({
   baseURL,
