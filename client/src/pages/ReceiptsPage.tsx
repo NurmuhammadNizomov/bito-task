@@ -41,15 +41,15 @@ export function ReceiptsPage() {
   }, []);
 
   return (
-    <Box maxW="900px" mx="auto" p={6}>
+    <Box maxW="900px" mx="auto" p={{ base: 3, sm: 4, md: 6 }}>
       <VStack gap={6} align="stretch">
-        <Heading size="xl">Receipt</Heading>
+        <Heading size="xl">Receipts</Heading>
 
         {error && <ErrorState message={error} />}
 
         {loading && (
           <Card.Root shadow="sm" borderRadius="l2">
-            <Card.Body>
+            <Card.Body p={{ base: 3, sm: 4 }}>
               <VStack gap={3} align="stretch">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Skeleton key={i} h={10} borderRadius="md" />
@@ -64,48 +64,50 @@ export function ReceiptsPage() {
         )}
 
         {!loading && !error && orders.length > 0 && (
-          <Card.Root shadow="sm" borderRadius="l2">
+          <Card.Root shadow="sm" borderRadius="l2" overflow="hidden">
             <Card.Body p={0}>
-              <Table.Root variant="outline" size="sm">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeader>Order #</Table.ColumnHeader>
-                    <Table.ColumnHeader>Date</Table.ColumnHeader>
-                    <Table.ColumnHeader>Status</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="right">Grand Total</Table.ColumnHeader>
-                    <Table.ColumnHeader />
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {orders.map((order, i) => (
-                    <Table.Row key={order._id}>
-                      <Table.Cell>
-                        <Text fontFamily="mono" fontSize="sm">#{orders.length - i}</Text>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Text fontSize="sm">{format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</Text>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Badge colorPalette={statusColor(order.status)} size="sm">
-                          {statusLabel(order.status)}
-                        </Badge>
-                      </Table.Cell>
-                      <Table.Cell textAlign="right">
-                        <Text fontWeight="semibold">{order.total.toLocaleString()} so'm</Text>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Button
-                          size="xs"
-                          variant="outline"
-                          onClick={() => navigate(`/receipt/${order._id}`)}
-                        >
-                          {order.status === 'paid' ? 'View Receipt' : 'Confirm payment'}
-                        </Button>
-                      </Table.Cell>
+              <Box overflowX="auto">
+                <Table.Root variant="outline" size="sm" minW="500px">
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.ColumnHeader>Order #</Table.ColumnHeader>
+                      <Table.ColumnHeader>Date</Table.ColumnHeader>
+                      <Table.ColumnHeader>Status</Table.ColumnHeader>
+                      <Table.ColumnHeader textAlign="right">Grand Total</Table.ColumnHeader>
+                      <Table.ColumnHeader />
                     </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
+                  </Table.Header>
+                  <Table.Body>
+                    {orders.map((order, i) => (
+                      <Table.Row key={order._id}>
+                        <Table.Cell>
+                          <Text fontFamily="mono" fontSize="sm">#{orders.length - i}</Text>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Text fontSize="sm">{format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</Text>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Badge colorPalette={statusColor(order.status)} size="sm">
+                            {statusLabel(order.status)}
+                          </Badge>
+                        </Table.Cell>
+                        <Table.Cell textAlign="right">
+                          <Text fontWeight="semibold">{order.total.toLocaleString()} so'm</Text>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() => navigate(`/receipt/${order._id}`)}
+                          >
+                            {order.status === 'paid' ? 'View Receipt' : 'Confirm payment'}
+                          </Button>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table.Root>
+              </Box>
             </Card.Body>
           </Card.Root>
         )}

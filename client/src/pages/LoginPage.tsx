@@ -65,7 +65,7 @@ export function LoginPage() {
   }
 
   return (
-    <Flex h="100vh" align="center" justify="center" p={4} overflow="hidden">
+    <Flex minH="calc(100vh - 40px)" align="center" justify="center" px={{ base: 2, sm: 4 }} py={{ base: 4, sm: 8 }} overflow="auto">
       <Card.Root
         maxW="400px"
         w="full"

@@ -49,14 +49,15 @@ function NavBar() {
       top={0}
       zIndex={10}
     >
-      <Text fontWeight="bold" fontSize="lg" mr={2}>POS</Text>
+      <Text fontWeight="bold" fontSize="lg" mr={{ base: 1, sm: 2 }}>POS</Text>
 
-      <HStack gap={1}>
+      <HStack gap={{ base: 0.5, sm: 1 }}>
         {navLinks.map((link) => (
           <Button
             key={link.path}
             variant={location.pathname === link.path ? 'subtle' : 'ghost'}
             size="sm"
+            px={{ base: 2, sm: 3 }}
             colorPalette={location.pathname === link.path ? 'blue' : 'gray'}
             onClick={() => navigate(link.path)}
           >
@@ -67,15 +68,15 @@ function NavBar() {
 
       <Spacer />
 
-      <HStack gap={2}>
+      <HStack gap={{ base: 1, sm: 2 }}>
         <IconButton aria-label="Toggle dark mode" variant="ghost" size="sm" onClick={toggleColorMode}>
           {colorMode === 'light' ? <FiMoon /> : <FiSun />}
         </IconButton>
 
         <MenuRoot>
           <MenuTrigger asChild>
-            <HStack cursor="pointer" gap={2} px={2} py={1} borderRadius="md" _hover={{ bg: 'bg.subtle' }}>
-              <Text fontSize="sm" fontWeight="medium">{user?.name}</Text>
+            <HStack cursor="pointer" gap={{ base: 1, sm: 2 }} px={{ base: 1.5, sm: 2 }} py={1} borderRadius="md" _hover={{ bg: 'bg.subtle' }}>
+              <Text fontSize="sm" fontWeight="medium" display={{ base: 'none', sm: 'inline' }} maxW="120px" truncate>{user?.name}</Text>
               <Badge colorPalette="blue" size="sm">{user?.role}</Badge>
               <FiChevronDown style={{ opacity: 0.5 }} />
             </HStack>
@@ -103,7 +104,7 @@ export default function App() {
     <BrowserRouter>
       <ToastContainer />
       <NavBar />
-      <Container maxW="1400px" py={4}>
+      <Container maxW="1400px" px={{ base: 2, sm: 4 }} py={{ base: 2, md: 4 }}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute><PosPage /></ProtectedRoute>} />

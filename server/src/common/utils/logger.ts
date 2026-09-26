@@ -16,22 +16,35 @@ const rotateOptions = {
   createSymlink: false,
 };
 
+const isVercel = Boolean(process.env.VERCEL);
+
+const loggerTransports: any[] = [
+  new transports.Console({
+    format: isDev ? combine(colorize(), simple()) : combine(timestamp(), json()),
+  }),
+];
+
+if (!isVercel) {
+  try {
+    loggerTransports.push(
+      new DailyRotateFile({
+        ...rotateOptions,
+        filename: join(env.LOG_DIR, 'app-%DATE%.log'),
+        format: fileFormat,
+      }),
+      new DailyRotateFile({
+        ...rotateOptions,
+        filename: join(env.LOG_DIR, 'error-%DATE%.log'),
+        level: 'error',
+        format: fileFormat,
+      })
+    );
+  } catch {
+    // Fallback to console only if filesystem is read-only
+  }
+}
+
 export const logger = createLogger({
   level: isDev ? 'debug' : env.LOG_LEVEL,
-  transports: [
-    new DailyRotateFile({
-      ...rotateOptions,
-      filename: join(env.LOG_DIR, 'app-%DATE%.log'),
-      format: fileFormat,
-    }),
-    new DailyRotateFile({
-      ...rotateOptions,
-      filename: join(env.LOG_DIR, 'error-%DATE%.log'),
-      level: 'error',
-      format: fileFormat,
-    }),
-    ...(isDev
-      ? [new transports.Console({ format: combine(colorize(), simple()) })]
-      : []),
-  ],
+  transports: loggerTransports,
 });

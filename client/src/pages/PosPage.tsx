@@ -23,6 +23,7 @@ interface CartItem {
 export function PosPage() {
   // Keep the search term in the URL (?search=) so a refresh preserves the filter.
   const [searchParams, setSearchParams] = useSearchParams();
+  const [mobileTab, setMobileTab] = useState<'catalog' | 'cart'>('catalog');
   const [query, setQuery] = useState(() => searchParams.get('search') ?? '');
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -151,119 +152,200 @@ export function PosPage() {
   const itemCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
   return (
-    <Grid templateColumns={{ base: '1fr', md: '3fr 2fr' }} gap={4} h="calc(100vh - 80px)">
-      {/* Left Panel - Product Catalog */}
-      <Box overflow="auto" p={5} borderWidth={1} borderColor="border" borderRadius="l2" bg="bg.panel" shadow="sm">
-        <VStack gap={4} align="stretch">
-          <Heading size="lg">POS Checkout</Heading>
+    <Box>
+      {/* Mobile Tab Switcher */}
+      <HStack display={{ base: 'flex', lg: 'none' }} mb={3} gap={2}>
+        <Button
+          flex={1}
+          variant={mobileTab === 'catalog' ? 'solid' : 'subtle'}
+          colorPalette="blue"
+          size="md"
+          onClick={() => setMobileTab('catalog')}
+        >
+          Products ({products.length})
+        </Button>
+        <Button
+          flex={1}
+          variant={mobileTab === 'cart' ? 'solid' : 'subtle'}
+          colorPalette={cart.length > 0 ? 'green' : 'gray'}
+          size="md"
+          onClick={() => setMobileTab('cart')}
+        >
+          Cart ({itemCount}){total > 0 ? ` • ${total.toLocaleString()}` : ''}
+        </Button>
+      </HStack>
 
-          <InputGroup startElement={<FiSearch />}>
-            <Input
-              placeholder="Search products..."
-              value={query}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              bg="bg"
-            />
-          </InputGroup>
+      <Grid templateColumns={{ base: '1fr', lg: '3fr 2fr' }} gap={{ base: 3, md: 4 }} h={{ base: 'auto', lg: 'calc(100vh - 88px)' }}>
+        {/* Left Panel - Product Catalog */}
+        <Box
+          display={{ base: mobileTab === 'catalog' ? 'block' : 'none', lg: 'block' }}
+          overflow="auto"
+          p={{ base: 3, sm: 5 }}
+          borderWidth={1}
+          borderColor="border"
+          borderRadius="l2"
+          bg="bg.panel"
+          shadow="sm"
+        >
+          <VStack gap={4} align="stretch">
+            <Heading size="lg">POS Checkout</Heading>
 
-          {searching ? (
-            <Flex justify="center" py={16}>
-              <Spinner />
-            </Flex>
-          ) : products.length === 0 ? (
-            <EmptyState title="No products found" description="Search products..." />
-          ) : (
-            <Stack gap={3}>
-              {products.map((p) => {
-                const isOutOfStock = p.stock <= 0;
-                const isLowStock = p.stock > 0 && p.stock < 10;
-                return (
-                  <Card.Root
-                    key={p._id}
-                    variant="outline"
-                    transition="all 0.15s"
-                    _hover={{ borderColor: 'brand.400', shadow: 'sm', transform: 'translateY(-1px)' }}
-                  >
-                    <Card.Body py={3} px={4}>
-                      <Flex justify="space-between" align="center" gap={4}>
-                        <Box minW={0}>
-                          <Text fontWeight="semibold" truncate>{p.name}</Text>
-                          <Text fontSize="sm" color="fg.muted">{p.sku}</Text>
-                          <HStack gap={2} mt={1} flexWrap="wrap">
-                            {isOutOfStock ? (
-                              <Badge colorPalette="red" size="sm">Out of stock</Badge>
-                            ) : isLowStock ? (
-                              <Badge colorPalette="yellow" size="sm">Low stock ({p.stock})</Badge>
-                            ) : (
-                              <Text fontSize="sm" color="fg.muted">{p.stock} items</Text>
-                            )}
-                            <Text fontWeight="bold" color="blue.600">
-                              {p.salePrice.toLocaleString()} so'm
-                            </Text>
-                          </HStack>
-                        </Box>
-                        <Button
-                          size="sm"
-                          colorPalette="blue"
-                          onClick={() => addToCart(p)}
-                          disabled={isOutOfStock}
-                          flexShrink={0}
-                        >
-                          Add
-                        </Button>
-                      </Flex>
-                    </Card.Body>
-                  </Card.Root>
-                );
-              })}
-            </Stack>
-          )}
-        </VStack>
-      </Box>
+            <InputGroup startElement={<FiSearch />}>
+              <Input
+                placeholder="Search products..."
+                value={query}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                bg="bg"
+              />
+            </InputGroup>
 
-      {/* Right Panel - Cart */}
-      <Box
-        overflow="auto"
-        p={5}
-        borderWidth={1}
-        borderColor="border"
-        borderRadius="l2"
-        bg="bg.panel"
-        shadow="sm"
-        display="flex"
-        flexDirection="column"
-      >
-        <Heading size="lg" mb={4}>Cart</Heading>
+            {searching ? (
+              <Flex justify="center" py={16}>
+                <Spinner />
+              </Flex>
+            ) : products.length === 0 ? (
+              <EmptyState title="No products found" description="Search products..." />
+            ) : (
+              <Stack gap={3}>
+                {products.map((p) => {
+                  const isOutOfStock = p.stock <= 0;
+                  const isLowStock = p.stock > 0 && p.stock < 10;
+                  return (
+                    <Card.Root
+                      key={p._id}
+                      variant="outline"
+                      transition="all 0.15s"
+                      _hover={{ borderColor: 'brand.400', shadow: 'sm', transform: 'translateY(-1px)' }}
+                    >
+                      <Card.Body py={3} px={{ base: 3, sm: 4 }}>
+                        <Flex justify="space-between" align="center" gap={{ base: 2, sm: 4 }}>
+                          <Box minW={0} flex={1}>
+                            <Text fontWeight="semibold" truncate>{p.name}</Text>
+                            <Text fontSize="sm" color="fg.muted">{p.sku}</Text>
+                            <HStack gap={2} mt={1} flexWrap="wrap">
+                              {isOutOfStock ? (
+                                <Badge colorPalette="red" size="sm">Out of stock</Badge>
+                              ) : isLowStock ? (
+                                <Badge colorPalette="yellow" size="sm">Low stock ({p.stock})</Badge>
+                              ) : (
+                                <Text fontSize="sm" color="fg.muted">{p.stock} items</Text>
+                              )}
+                              <Text fontWeight="bold" color="blue.600">
+                                {p.salePrice.toLocaleString()} so'm
+                              </Text>
+                            </HStack>
+                          </Box>
+                          <Button
+                            size="sm"
+                            colorPalette="blue"
+                            onClick={() => addToCart(p)}
+                            disabled={isOutOfStock}
+                            flexShrink={0}
+                          >
+                            Add
+                          </Button>
+                        </Flex>
+                      </Card.Body>
+                    </Card.Root>
+                  );
+                })}
+              </Stack>
+            )}
 
-        {cart.length === 0 ? (
-          <Flex flex={1} align="center" justify="center">
-            <EmptyState title="Cart is empty" />
+            {/* Mobile floating bottom quick-cart bar */}
+            {cart.length > 0 && (
+              <Box
+                display={{ base: 'block', lg: 'none' }}
+                position="sticky"
+                bottom={2}
+                zIndex={15}
+                mt={3}
+              >
+                <Card.Root bg="blue.600" color="white" shadow="xl" borderRadius="l2">
+                  <Card.Body p={3}>
+                    <Flex justify="space-between" align="center">
+                      <Box>
+                        <Text fontWeight="bold" fontSize="md">{total.toLocaleString()} so'm</Text>
+                        <Text fontSize="xs" opacity={0.9}>{itemCount} items selected</Text>
+                      </Box>
+                      <Button
+                        size="sm"
+                        bg="white"
+                        color="blue.700"
+                        fontWeight="bold"
+                        onClick={() => setMobileTab('cart')}
+                      >
+                        View Cart →
+                      </Button>
+                    </Flex>
+                  </Card.Body>
+                </Card.Root>
+              </Box>
+            )}
+          </VStack>
+        </Box>
+
+        {/* Right Panel - Cart */}
+        <Box
+          display={{ base: mobileTab === 'cart' ? 'flex' : 'none', lg: 'flex' }}
+          overflow="auto"
+          p={{ base: 3, sm: 5 }}
+          borderWidth={1}
+          borderColor="border"
+          borderRadius="l2"
+          bg="bg.panel"
+          shadow="sm"
+          flexDirection="column"
+        >
+          <Flex justify="space-between" align="center" mb={4}>
+            <Heading size="lg">Cart</Heading>
+            <Button
+              size="xs"
+              variant="ghost"
+              display={{ base: 'inline-flex', lg: 'none' }}
+              onClick={() => setMobileTab('catalog')}
+            >
+              ← Add more items
+            </Button>
           </Flex>
-        ) : (
-          <>
-            <Box flex={1} overflow="auto">
-              <Table.Root size="sm">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeader>Product</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="center">Qty</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="right">Price</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="right">Total</Table.ColumnHeader>
-                    <Table.ColumnHeader />
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {cart.map((c) => (
-                    <Table.Row key={c.productId}>
-                      <Table.Cell>
-                        <Text fontWeight="medium" fontSize="sm">{c.name}</Text>
-                      </Table.Cell>
-                      <Table.Cell textAlign="center">
-                        <NumberInput.Root
-                          value={c.quantity.toString()}
-                          min={0}
-                          max={c.stock}
-                          onValueChange={(e) => {
+
+          {cart.length === 0 ? (
+            <Flex flex={1} align="center" justify="center" direction="column" gap={3} py={10}>
+              <EmptyState title="Cart is empty" />
+              <Button
+                display={{ base: 'inline-flex', lg: 'none' }}
+                size="sm"
+                colorPalette="blue"
+                onClick={() => setMobileTab('catalog')}
+              >
+                Browse Products
+              </Button>
+            </Flex>
+          ) : (
+            <>
+              <Box flex={1} overflowX="auto">
+                <Table.Root size="sm" minW={{ base: '340px', sm: '100%' }}>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.ColumnHeader>Product</Table.ColumnHeader>
+                      <Table.ColumnHeader textAlign="center">Qty</Table.ColumnHeader>
+                      <Table.ColumnHeader textAlign="right">Price</Table.ColumnHeader>
+                      <Table.ColumnHeader textAlign="right">Total</Table.ColumnHeader>
+                      <Table.ColumnHeader />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {cart.map((c) => (
+                      <Table.Row key={c.productId}>
+                        <Table.Cell>
+                          <Text fontWeight="medium" fontSize="sm">{c.name}</Text>
+                        </Table.Cell>
+                        <Table.Cell textAlign="center">
+                          <NumberInput.Root
+                            value={c.quantity.toString()}
+                            min={0}
+                            max={c.stock}
+                            onValueChange={(e) => {
                             const qty = Number.isNaN(e.valueAsNumber) ? 0 : e.valueAsNumber;
                             if (qty > c.stock) {
                               setError('Stock changed');
@@ -358,5 +440,6 @@ export function PosPage() {
         )}
       </Box>
     </Grid>
+  </Box>
   );
 }

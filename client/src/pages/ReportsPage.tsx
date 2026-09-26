@@ -117,30 +117,30 @@ export function ReportsPage() {
   const totalQtySold = report?.items.reduce((sum, i) => sum + i.quantity, 0) ?? 0;
 
   return (
-    <Box maxW="1100px" mx="auto" p={6}>
+    <Box maxW="1100px" mx="auto" p={{ base: 3, sm: 4, md: 6 }}>
       <VStack gap={6} align="stretch">
         <HStack justify="space-between" wrap="wrap" gap={3}>
           <Heading size="xl">Reports</Heading>
         </HStack>
 
         <Card.Root shadow="sm" borderRadius="l2">
-          <Card.Body>
+          <Card.Body p={{ base: 3, sm: 4 }}>
             <HStack gap={4} wrap="wrap" align="flex-end">
-              <Box>
+              <Box flex={{ base: '1 1 100%', sm: 'auto' }}>
                 <DatePickerField
                   label="From"
                   value={fromLocalISODate(from)}
                   onChange={(d) => setFrom(toLocalISODate(d))}
                 />
               </Box>
-              <Box>
+              <Box flex={{ base: '1 1 100%', sm: 'auto' }}>
                 <DatePickerField
                   label="To"
                   value={fromLocalISODate(to)}
                   onChange={(d) => setTo(toLocalISODate(d))}
                 />
               </Box>
-              <Button colorPalette="blue" onClick={() => loadReport()} loading={loading} minW="100px">
+              <Button colorPalette="blue" onClick={() => loadReport()} loading={loading} minW="100px" w={{ base: '100%', sm: 'auto' }}>
                 Apply
               </Button>
             </HStack>
@@ -185,56 +185,58 @@ export function ReportsPage() {
                 <Heading size="md">Top Products</Heading>
               </Card.Header>
               <Card.Body p={0}>
-                <Table.Root size="md" striped interactive stickyHeader>
-                  <Table.Header>
-                    <Table.Row bg="bg.muted">
-                      <Table.ColumnHeader w="48px" textAlign="center" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">#</Table.ColumnHeader>
-                      <Table.ColumnHeader fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Product</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="center" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Qty Sold</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Cost</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Revenue</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Margin</Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {report.items.length === 0 ? (
-                      <Table.Row>
-                        <Table.Cell colSpan={6} textAlign="center" py={10} color="fg.muted">
-                          No sales found
-                        </Table.Cell>
+                <Box overflowX="auto">
+                  <Table.Root size={{ base: 'sm', md: 'md' }} minW="580px" striped interactive stickyHeader>
+                    <Table.Header>
+                      <Table.Row bg="bg.muted">
+                        <Table.ColumnHeader w="48px" textAlign="center" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">#</Table.ColumnHeader>
+                        <Table.ColumnHeader fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Product</Table.ColumnHeader>
+                        <Table.ColumnHeader textAlign="center" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Qty Sold</Table.ColumnHeader>
+                        <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Cost</Table.ColumnHeader>
+                        <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Revenue</Table.ColumnHeader>
+                        <Table.ColumnHeader textAlign="right" fontSize="xs" textTransform="uppercase" letterSpacing="wide" color="fg.muted">Margin</Table.ColumnHeader>
                       </Table.Row>
-                    ) : (
-                      report.items.map((item, i) => (
-                        <Table.Row key={i}>
-                          <Table.Cell textAlign="center">
-                            <Flex
-                              w={6} h={6} mx="auto" align="center" justify="center"
-                              borderRadius="full" bg="bg.emphasized" color="fg.muted"
-                              fontSize="xs" fontWeight="bold"
-                            >
-                              {i + 1}
-                            </Flex>
-                          </Table.Cell>
-                          <Table.Cell fontWeight="medium">{item.productName}</Table.Cell>
-                          <Table.Cell textAlign="center">
-                            <Badge colorPalette="blue" variant="subtle" size="sm">{item.quantity}</Badge>
-                          </Table.Cell>
-                          <Table.Cell textAlign="right" color="fg.muted" fontVariantNumeric="tabular-nums">{formatCurrency(item.cost)}</Table.Cell>
-                          <Table.Cell textAlign="right" fontWeight="medium" fontVariantNumeric="tabular-nums">{formatCurrency(item.revenue)}</Table.Cell>
-                          <Table.Cell textAlign="right" fontWeight="semibold" fontVariantNumeric="tabular-nums" color={item.margin >= 0 ? 'green.600' : 'red.500'}>
-                            {formatCurrency(item.margin)}
+                    </Table.Header>
+                    <Table.Body>
+                      {report.items.length === 0 ? (
+                        <Table.Row>
+                          <Table.Cell colSpan={6} textAlign="center" py={10} color="fg.muted">
+                            No sales found
                           </Table.Cell>
                         </Table.Row>
-                      ))
-                    )}
-                  </Table.Body>
-                </Table.Root>
+                      ) : (
+                        report.items.map((item, i) => (
+                          <Table.Row key={i}>
+                            <Table.Cell textAlign="center">
+                              <Flex
+                                w={6} h={6} mx="auto" align="center" justify="center"
+                                borderRadius="full" bg="bg.emphasized" color="fg.muted"
+                                fontSize="xs" fontWeight="bold"
+                              >
+                                {i + 1}
+                              </Flex>
+                            </Table.Cell>
+                            <Table.Cell fontWeight="medium">{item.productName}</Table.Cell>
+                            <Table.Cell textAlign="center">
+                              <Badge colorPalette="blue" variant="subtle" size="sm">{item.quantity}</Badge>
+                            </Table.Cell>
+                            <Table.Cell textAlign="right" color="fg.muted" fontVariantNumeric="tabular-nums">{formatCurrency(item.cost)}</Table.Cell>
+                            <Table.Cell textAlign="right" fontWeight="medium" fontVariantNumeric="tabular-nums">{formatCurrency(item.revenue)}</Table.Cell>
+                            <Table.Cell textAlign="right" fontWeight="semibold" fontVariantNumeric="tabular-nums" color={item.margin >= 0 ? 'green.600' : 'red.500'}>
+                              {formatCurrency(item.margin)}
+                            </Table.Cell>
+                          </Table.Row>
+                        ))
+                      )}
+                    </Table.Body>
+                  </Table.Root>
+                </Box>
               </Card.Body>
             </Card.Root>
 
             <Separator />
 
-            <HStack justify="flex-end" gap={6}>
+            <Flex justify={{ base: 'space-between', sm: 'flex-end' }} wrap="wrap" gap={{ base: 3, sm: 6 }}>
               <Stat.Root textAlign="right">
                 <Stat.Label fontSize="xs">Cost</Stat.Label>
                 <Stat.ValueText fontSize="lg" color="fg.muted">{formatCurrency(report.totalCost)}</Stat.ValueText>
@@ -249,7 +251,7 @@ export function ReportsPage() {
                   {formatCurrency(report.totalMargin)}
                 </Stat.ValueText>
               </Stat.Root>
-            </HStack>
+            </Flex>
           </>
         )}
       </VStack>
