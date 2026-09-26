@@ -67,10 +67,13 @@ app.use('/api/v1', routes);
 
 // Static file serving for React build (Single deployment for Vercel / Node)
 const candidateDistPaths = [
-  path.resolve(__dirname, '../../client/dist'),
-  path.resolve(__dirname, '../client/dist'),
-  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(__dirname, '../../web/dist'),
+  path.resolve(__dirname, '../../../apps/web/dist'),
+  path.resolve(process.cwd(), 'apps/web/dist'),
+  path.resolve(process.cwd(), 'web/dist'),
   path.resolve(process.cwd(), 'dist'),
+  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(__dirname, '../../client/dist'),
 ];
 
 const clientDistPath = candidateDistPaths.find((p) => fs.existsSync(p));

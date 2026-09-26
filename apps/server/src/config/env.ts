@@ -17,6 +17,8 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
 });
 
+process.env.SERVER_PORT = process.env.SERVER_PORT || process.env.PORT || '5000';
+
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
