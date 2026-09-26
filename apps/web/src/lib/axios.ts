@@ -20,10 +20,12 @@ export function getAccessToken() {
   return accessToken;
 }
 
-const rawApiUrl = import.meta.env.VITE_API_URL;
-const baseURL = rawApiUrl
-  ? `${rawApiUrl.replace(/\/+$/, '')}/api/v1`
-  : '/api/v1';
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+const baseURL = rawApiUrl.endsWith('/api/v1')
+  ? rawApiUrl
+  : rawApiUrl
+    ? `${rawApiUrl}/api/v1`
+    : '/api/v1';
 
 const api = axios.create({
   baseURL,
